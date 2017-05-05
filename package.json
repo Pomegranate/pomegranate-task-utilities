@@ -1,0 +1,36 @@
+{
+  "name": "pomegranate-task-utilities",
+  "version": "0.0.0",
+  "description": "Adds Utility methods to compliment pomegranate-task-runner actions.",
+  "main": "index.js",
+  "scripts": {
+    "test": "NODE_ENV=test tap -R spec --cov test/unit",
+    "test:report": "NODE_ENV=test tap -R spec --cov --coverage-report=lcov test/unit"
+  },
+  "keywords": [
+    "Pomegranate",
+    "Plugin",
+    "Tasks",
+    "RabbitMQ"
+  ],
+  "author": "Jim Bulkowski <jim.b@paperelectron.com> (http://paperelectron.com)",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "lodash": "^4.17.4"
+  },
+  "devDependencies": {
+    "tap": "^10.3.2"
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pomegranate/pomegranate-task-utilities.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Pomegranate/pomegranate-task-utilities/issues"
+  },
+  "homepage": "https://github.com/Pomegranate/pomegranate-task-utilities#readme"
+}
