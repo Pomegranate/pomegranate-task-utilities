@@ -6,14 +6,21 @@
  */
 
 'use strict';
-const TaskAdders = require('./lib/AddTask')
+const WriterFactory = require('./lib/TaskWriter/WriterFactory')
 /**
  *
  * @module index
  */
 
 exports.options = {
-  queues: [{propName: 'local', queueName: 'my.task.queue', type: 'queue' , options: {persistent: true}}]
+  queues: [{
+    propName: 'local',
+    queueName: 'my.task.queue',
+    type: 'queue' ,
+    RPC: { enabled: false, defaultTimeout: 1000 },
+    msgOptions: {persistent: true},
+    queueOptions: {}
+  }]
 }
 
 exports.metadata = {
@@ -35,11 +42,11 @@ exports.plugin = {
     if(RabbitConnection && this.options.queues && this.options.queues.length){
       return RabbitConnection.createChannel()
         .then((channel)=> {
-          return TaskAdders(this.options.queues, channel, this.Logger)
+          return WriterFactory(this.options.queues, channel, this.Logger)
         })
-        .then(function(taskadders){
-          if(Object.keys(taskadders)){
-            plugins.push({param: 'AddTask', load: taskadders})
+        .then(function(dynamics){
+          if(Object.keys(dynamics)){
+            plugins.push({param: 'AddTask', load: dynamics})
           }
           loaded(null, plugins)
         })
@@ -49,7 +56,6 @@ exports.plugin = {
     } else {
       loaded(null, plugins)
     }
-
 
   },
   start: function(done) {
