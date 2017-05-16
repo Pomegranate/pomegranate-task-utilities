@@ -7,6 +7,7 @@
 
 'use strict';
 const WriterFactory = require('./lib/TaskWriter/WriterFactory')
+const _ = require('lodash')
 /**
  *
  * @module index
@@ -26,8 +27,7 @@ exports.options = {
 exports.metadata = {
   name: 'TaskUtilities',
   type: 'dynamic',
-  optional: ['RabbitConnection'],
-  provides: ['MachineLoader']
+  optional: ['RabbitConnection']
 }
 
 exports.plugin = {
@@ -42,6 +42,11 @@ exports.plugin = {
     if(RabbitConnection && this.options.queues && this.options.queues.length){
       return RabbitConnection.createChannel()
         .then((channel)=> {
+          if(_.some(this.options.queues, {RPC: {enabled: true}})){
+            this.Logger.log('RPC enabled queues found, will load "RpcReply".')
+            let rpcr = require('./lib/RpcReply')
+            plugins.push({param: 'RpcReply', load: rpcr(channel)})
+          }
           return WriterFactory(this.options.queues, channel, this.Logger)
         })
         .then(function(dynamics){
