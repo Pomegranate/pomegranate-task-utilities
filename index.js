@@ -6,7 +6,7 @@
  */
 
 'use strict';
-const WriterFactory = require('./lib/TaskWriter/WriterFactory')
+const WriterFacade = require('./lib/TaskWriter/WriterFacade')
 const _ = require('lodash')
 /**
  *
@@ -42,17 +42,18 @@ exports.plugin = {
     if(RabbitConnection && this.options.queues && this.options.queues.length){
       return RabbitConnection.createChannel()
         .then((channel)=> {
+
           if(_.some(this.options.queues, {RPC: {enabled: true}})){
-            this.Logger.log('RPC enabled queues found, will load "RpcReply".')
+            this.Logger.log("RPC enabled queues found, will load - 'RpcReply'.")
             let rpcr = require('./lib/RpcReply')
             plugins.push({param: 'RpcReply', load: rpcr(channel)})
           }
-          return WriterFactory(this.options.queues, channel, this.Logger)
+
+          let wf = new WriterFacade(this.options.queues, channel, this.Logger)
+          plugins.push({param: 'AddTask', load: wf})
+          return wf.initialize()
         })
         .then(function(dynamics){
-          if(Object.keys(dynamics)){
-            plugins.push({param: 'AddTask', load: dynamics})
-          }
           loaded(null, plugins)
         })
         .catch((err) => {
