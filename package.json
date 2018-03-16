@@ -1,6 +1,6 @@
 {
   "name": "pomegranate-task-utilities",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Adds Utility methods to compliment pomegranate-task-runner actions.",
   "main": "index.js",
   "scripts": {
