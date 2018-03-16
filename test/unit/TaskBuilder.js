@@ -5,7 +5,7 @@
  * @license MIT {@link http://opensource.org/licenses/MIT}
  */
 
-"use strict";
+'use strict';
 const tap = require('tap')
 const TaskBuilder = require('../../lib/TaskBuilder')
 
@@ -16,25 +16,25 @@ tap.test('Throws under a few circumstances.', (t) => {
    * without calling this someplace first, it will throw.
    */
   t.test('With invalid arguments to .mailTask()', (tt) => {
-    tt.throws(function(){
+    tt.throws(function() {
         let m = new TaskBuilder()
           .task()
       }, /Requires a task name, e.g. my.awesome.task./,
       'Throws when .task is called with no arg.')
 
-    tt.throws(function(){
+    tt.throws(function() {
         let m = new TaskBuilder()
           .task([])
       }, /Task name must be a string./,
       'Throws when .task is called without a string arg -- array.')
 
-    tt.throws(function(){
+    tt.throws(function() {
         let m = new TaskBuilder()
           .task({})
       }, /Task name must be a string./,
       'Throws when .task is called without a string arg -- object.')
 
-    tt.throws(function(){
+    tt.throws(function() {
         let m = new TaskBuilder()
           .task(6)
       }, /Task name must be a string./,
@@ -49,25 +49,25 @@ tap.test('Throws under a few circumstances.', (t) => {
    */
 
   t.test('With invalid arguments to .notifyTask()', (tt) => {
-    tt.throws(function(){
+    tt.throws(function() {
         let m = new TaskBuilder()
           .notifyTask()
       }, /Requires a notify task name, e.g. my.notify.task./,
       'Throws when .notifyTask is called with no arg.')
 
-    tt.throws(function(){
+    tt.throws(function() {
         let m = new TaskBuilder()
           .notifyTask([])
       }, /Notify task name must be a string./,
       'Throws when .notifyTask is called without a string arg -- array.')
 
-    tt.throws(function(){
+    tt.throws(function() {
         let m = new TaskBuilder()
           .notifyTask({})
       }, /Notify task name must be a string./,
       'Throws when .notifyTask is called without a string arg -- object.')
 
-    tt.throws(function(){
+    tt.throws(function() {
         let m = new TaskBuilder()
           .notifyTask(6)
       }, /Notify task name must be a string./,
@@ -76,14 +76,54 @@ tap.test('Throws under a few circumstances.', (t) => {
     tt.end()
   })
 
+  t.test('With invalid args to .notifyQueue()', (tt) => {
+    tt.throws(function() {
+
+        let m = new TaskBuilder()
+          .task('my.awesome.task')
+          .notifyQueue()
+
+      }, /Requires a queueName param/,
+      'Throws when .notifyQueue is called with no arg.')
+
+    tt.throws(function() {
+
+        let m = new TaskBuilder()
+          .task('my.awesome.task')
+          .notifyQueue([])
+
+      }, /notify queueName name must be a string./,
+      'Throws when .notifyQueue is called without a string arg -- array.')
+
+    tt.throws(function() {
+
+        let m = new TaskBuilder()
+          .task('my.awesome.task')
+          .notifyQueue({})
+
+      }, /notify queueName name must be a string./,
+      'Throws when .notifyQueue is called without a string arg -- object.')
+
+    tt.throws(function() {
+
+        let m = new TaskBuilder()
+          .task('my.awesome.task')
+          .notifyQueue(2)
+
+      }, /notify queueName name must be a string./,
+      'Throws when .notifyQueue is called without a string arg -- number.')
+
+    tt.end()
+  })
+
   t.test('With .build() called without tasknames set.', (tt) => {
 
-    tt.throws(function(){
+    tt.throws(function() {
       let m = new TaskBuilder()
         .build()
     }, /Task name is not set./, 'Throws when .build() is called without .task() set.')
 
-    tt.throws(function(){
+    tt.throws(function() {
       let m = new TaskBuilder()
         .task('my.awesome.task')
         .notifyProp('a', 'b')
@@ -93,22 +133,23 @@ tap.test('Throws under a few circumstances.', (t) => {
     tt.end()
   })
 
-
   t.end()
 })
 
 tap.test('Does not throw under others.', (t) => {
 
-  t.doesNotThrow(function(){
+  t.doesNotThrow(function() {
     let m = new TaskBuilder()
       .task('a.b.c')
       .build()
   }, 'Does not throw with a string arg.')
 
-  t.doesNotThrow(function(){
+  t.doesNotThrow(function() {
+
     let m = new TaskBuilder()
       .task('a.b.c')
       .notifyTask('e.f.g')
+      .notifyQueue('h.i.j')
       .build()
   }, 'Does not throw with a string arg.')
 
@@ -127,37 +168,51 @@ tap.test('Basic usage', (t) => {
     .payloadProp('address', 'bob@example.com')
     .payloadProp('subject', 'Hello from us.')
 
-
   t.type(m1.build(), 'object', '.build returns an object.')
   t.type(m1.build('derp'), 'undefined', '.build(prop) with nox existent prop returns undefined.')
 
   t.equal(m1.build('payload').address, 'tom@example.com', 'Passing an existing property to build should return that property')
   t.equal(m2.build('payload').address, 'bob@example.com', 'Set properties on distinct object should be equal.')
 
-
   t.end()
 })
 
 tap.test('Adding a notifier object', (t) => {
 
-  let m = new TaskBuilder()
-    .task('my.awesome.task')
-    .notifyTask('my.notify.task')
-    .payloadProp('address', 'tom@example.com')
-    .payloadProp('subject', 'Hello from us.')
-    .notifyProp('userUUID', '123456')
-    .notifyProp('values', ['updatedAt', 'emailSent'])
-    .build()
+  t.test('throws with no queuename set', (tt) => {
+    tt.throws(function() {
+        let m = new TaskBuilder()
+          .task('my.awesome.task')
+          .notifyTask('my.notify.task')
+          .build()
+      }, /Notifier queue name is not set./,
+      'Throws when .notifyTask is called without a string arg -- object.')
 
-  t.equal(m.notify.taskName, 'my.notify.task', 'Notify task name set correctly.')
-  t.equal(m.taskName, 'my.awesome.task', 'Mail task name set correctly.')
+    tt.end()
+  })
+
+  t.test('Works with all params set', (tt) => {
+    let m = new TaskBuilder()
+      .task('my.awesome.task')
+      .notifyTask('my.notify.task')
+      .notifyQueue('a.b.c')
+      .payloadProp('address', 'tom@example.com')
+      .payloadProp('subject', 'Hello from us.')
+      .notifyProp('userUUID', '123456')
+      .notifyProp('values', ['updatedAt', 'emailSent'])
+      .build()
+
+    t.equal(m.notify.taskName, 'my.notify.task', 'Notify task name set correctly.')
+    t.equal(m.taskName, 'my.awesome.task', 'Mail task name set correctly.')
+    tt.end()
+  })
 
   t.end()
 })
 
-
 tap.test('Execution order does not matter, other than build.', (t) => {
   let m = new TaskBuilder()
+    .notifyQueue('a.b.c')
     .payloadProp('address', 'tom@example.com')
     .payloadProp('subject', 'Hello from us.')
     .notifyProp('userUUID', '123456')
@@ -174,15 +229,16 @@ tap.test('Execution order does not matter, other than build.', (t) => {
 
 tap.test('Repeated calls to .notifyTask and .task are idempotent.', (t) => {
   let m = new TaskBuilder()
-    .payloadProp('a','b')
+    .payloadProp('a', 'b')
     .notifyProp('a', 'b')
     .notifyTask('a.b.c')
     .notifyTask('a.b.c.d')
     .task('f.g.h.i.j.k.l.m')
     .notifyTask('a.b.c.d.e')
-    .payloadProp('c','d')
+    .payloadProp('c', 'd')
     .notifyProp('c', 'd')
     .notifyTask('my.notify.task')
+    .notifyQueue('a.b.c')
     .task('n.o.p.q')
     .task('my.awesome.task')
     .build()
