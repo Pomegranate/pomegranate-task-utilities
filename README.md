@@ -81,7 +81,7 @@ Soon...
 
 ## 
 
-TaskBuilder
+./lib/TaskBuilder.js
 
 **Meta**
 
@@ -146,9 +146,9 @@ Returns **[Promise][17]**
 
 ```javascript
 let Task = new TaskBuilder()
-  .task('my.awesome.task)
-  .payloadProp('level', 'Awesome')
-  .build()
+ .task('my.awesome.task)
+ .payloadProp('level', 'Awesome')
+ .build()
 ```
 
 ### task
