@@ -146,7 +146,7 @@ Returns **[Promise][17]**
 
 ```javascript
 let Task = new TaskBuilder()
- .task('my.awesome.task)
+ .task('my.awesome.task')
  .payloadProp('level', 'Awesome')
  .build()
 ```
