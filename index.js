@@ -35,7 +35,7 @@ exports.plugin = {
 
     let plugins = [
       {param: 'TaskBuilder', load: require('./lib/TaskBuilder')},
-      {param: 'TaskValidator', load: require('./lib/ValidPayload')}
+      {param: 'TaskValidator', load: require('./lib/TaskValidator')}
     ]
 
     let RabbitConnection = inject('RabbitConnection')

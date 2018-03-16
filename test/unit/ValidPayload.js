@@ -7,7 +7,7 @@
 
 "use strict";
 const tap = require('tap')
-const ValidPayload = require('../../lib/ValidPayload')
+const ValidPayload = require('../../lib/TaskValidator')
 
 const testObj = {
   payload: {
