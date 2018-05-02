@@ -25,49 +25,41 @@ exports.options = {
 }
 
 exports.metadata = {
+  frameworkVersion: 6,
   name: 'TaskUtilities',
   type: 'dynamic',
   optional: ['RabbitConnection']
 }
 
 exports.plugin = {
-  load: function(inject, loaded) {
+  load: function(Options, Logger, Injector, inject, loaded) {
 
     let plugins = [
       {param: 'TaskBuilder', load: require('./lib/TaskBuilder')},
       {param: 'TaskValidator', load: require('./lib/TaskValidator')}
     ]
 
-    let RabbitConnection = inject('RabbitConnection')
-    if(RabbitConnection && this.options.queues && this.options.queues.length){
+    let RabbitConnection = Injector.inject('RabbitConnection')
+    if(RabbitConnection && Options.queues && Options.queues.length){
       return RabbitConnection.createChannel()
         .then((channel)=> {
 
-          if(_.some(this.options.queues, {RPC: {enabled: true}})){
-            this.Logger.log("RPC enabled queues found, will load - 'RpcReply'.")
+          if(_.some(Options.queues, {RPC: {enabled: true}})){
+            Logger.log("RPC enabled queues found, will load - 'RpcReply'.")
             let rpcr = require('./lib/RpcReply')
             plugins.push({param: 'RpcReply', load: rpcr(channel)})
           }
 
-          let wf = new WriterFacade(this.options.queues, channel, this.Logger)
+          let wf = new WriterFacade(Options.queues, channel, Logger)
           plugins.push({param: 'AddTask', load: wf})
           return wf.initialize()
         })
         .then(function(dynamics){
-          loaded(null, plugins)
+          return plugins
         })
-        .catch((err) => {
-          return loaded(err)
-        })
-    } else {
-      loaded(null, plugins)
     }
 
-  },
-  start: function(done) {
-    done()
-  },
-  stop: function(done) {
-    done()
+    return plugins
+
   }
 }
