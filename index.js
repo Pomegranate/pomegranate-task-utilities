@@ -21,7 +21,16 @@ exports.options = {
     RPC: { enabled: false, defaultTimeout: 1000 },
     msgOptions: {persistent: true},
     queueOptions: {}
-  }]
+  }],
+  exchanges: [
+    {
+      propName: 'fanout',
+      exchangeName: 'my.fanout.exchange',
+      type: 'fanout',
+      msgOptions: {persistent: true},
+      exchangeOptions: {}
+    }
+  ]
 }
 
 exports.metadata = {
@@ -50,7 +59,7 @@ exports.plugin = {
             plugins.push({param: 'RpcReply', load: rpcr(channel)})
           }
 
-          let wf = new WriterFacade(Options.queues, channel, Logger)
+          let wf = new WriterFacade(Options.queues,Options.exchanges, channel, Logger)
           plugins.push({param: 'AddTask', load: wf})
           return wf.initialize()
         })
