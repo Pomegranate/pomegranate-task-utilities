@@ -14,6 +14,7 @@ const _ = require('lodash')
  */
 
 exports.options = {
+  loadRpcReply: false,
   queues: [{
     propName: 'local',
     queueName: 'my.task.queue',
@@ -53,7 +54,7 @@ exports.plugin = {
       return RabbitConnection.createChannel()
         .then((channel)=> {
 
-          if(_.some(Options.queues, {RPC: {enabled: true}})){
+          if(Options.loadRpcReply||_.some(Options.queues, {RPC: {enabled: true}})){
             Logger.log("RPC enabled queues found, will load - 'RpcReply'.")
             let rpcr = require('./lib/RpcReply')
             plugins.push({param: 'RpcReply', load: rpcr(channel)})
